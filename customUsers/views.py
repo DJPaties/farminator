@@ -64,3 +64,20 @@ class CustomUserRegister(APIView):
             
             
 
+class CustomUserValidateToken(APIView):
+    def post(self, request):
+        custom_user  = None
+
+        try:
+            custom_Token = CustomToken.objects.get(token=request.data['token'])
+            custom_user = CustomUser.objects.get(id=custom_Token.custom_user_id)
+        
+            return Response({
+                'success':True,
+                'data':{
+                "token": request.data['token'],
+                'username': custom_user.username,
+                'id':custom_user.id    
+                }}, status=status.HTTP_200_OK)
+        except CustomToken.DoesNotExist:
+            return  Response({"error": True, 'message':"Unauthorized Token."}, status=status.HTTP_404_NOT_FOUND)
