@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['192.168.0.100', 'localhost', '127.0.0.1', '192.168.0.107']
 # Application definition
 
 INSTALLED_APPS = [
+    ''
     'farm.apps.FarmConfig',
     'customUsers.apps.CustomusersConfig',
     'django.contrib.admin',
