@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['192.168.0.100', 'localhost',
 # Application definition
 
 INSTALLED_APPS = [
-    ''
+    'remoteSystem.apps.RemotesystemConfig',
     'farm.apps.FarmConfig',
     'customUsers.apps.CustomusersConfig',
     'django.contrib.admin',

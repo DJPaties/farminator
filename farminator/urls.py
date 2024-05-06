@@ -20,5 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('customUsers.urls')),
     path('farms/', include('farm.urls')),
-    # path('farms/',include('farm.urls'))
+    path('system/',include('remoteSystem.urls'))
 ]
