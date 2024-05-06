@@ -7,7 +7,6 @@ from .models import Farm
 import json
 
 
-
 class FarmGetAll(APIView):
     def get(self, request):
         farms = Farm.objects.all()
@@ -16,6 +15,19 @@ class FarmGetAll(APIView):
             'success': True,
             "data": farms
         })
+
+
+class FarmGetUser(APIView):
+    def get(self, request):
+        farms = Farm.objects.filter(user_id=request.data['user_id'])
+        farms = [farm.serialize() for farm in farms]
+
+        return Response({
+            'success': True,
+            'data': farms,
+        })
+
+
 class FarmCreate(APIView):
     def post(self, request):
         serializer = FarmSerializer(data=request.data)
@@ -36,7 +48,6 @@ class FarmCreate(APIView):
         return Response(data)
 
 
-    
 class FarmEdit(APIView):
     def post(self, request):
         serializer = FarmSerializer(data=request.data)
@@ -48,7 +59,5 @@ class FarmEdit(APIView):
             print(serializer.errors)
 
         return Response({
-            'success':True
+            'success': True
         })
-
-
