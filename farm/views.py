@@ -18,8 +18,8 @@ class FarmGetAll(APIView):
 
 
 class FarmGetUser(APIView):
-    def get(self, request):
-        farms = Farm.objects.filter(user_id=request.data['user_id'])
+    def get(self, request, user_id):
+        farms = Farm.objects.filter(user_id=user_id)
         farms = [farm.serialize() for farm in farms]
 
         return Response({
@@ -34,7 +34,7 @@ class FarmCreate(APIView):
 
         if serializer.is_valid():
             farm = serializer.save()
-            request.data.pop('conditions')
+            # request.data.pop('conditions')
             data = {
                 "success": True,
                 "data": request.data
@@ -43,7 +43,7 @@ class FarmCreate(APIView):
         else:
             data = {
                 "success": True,
-                "message": serializer.errors["non_field_errors"][0]
+                "message": serializer.errors
             }
         return Response(data)
 
