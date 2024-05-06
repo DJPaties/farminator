@@ -36,7 +36,7 @@ class Farm(models.Model):
 
     def __str__(self) -> str:
         return self.title
-    
+
     def serialize(self):
         return {
             "id": self.id,
@@ -48,17 +48,24 @@ class Farm(models.Model):
 
 
 class FarmConditions(models.Model):
-    farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
+    farm_id = models.ForeignKey(Farm, on_delete=models.CASCADE)
     condition_type = models.CharField(
         max_length=15, null=False)
     condition_rule = models.CharField(
         max_length=12,  null=False)
     notify_at = models.FloatField(max_length=255, null=False)
 
-  
-
     class Meta:
         db_table = 'conditions'
 
     def __str__(self) -> str:
         return Farm.objects.get(id=self.farm_id)
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "farm_id_id": self.farm_id,
+            "condition_type": self.condition_type,
+            "condition_rule": self.condition_rule,
+            "notify_at": self.notify_at
+        }
