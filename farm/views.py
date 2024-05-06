@@ -7,27 +7,6 @@ from .models import Farm
 import json
 
 
-class FarmCreate(APIView):
-    def post(self, request):
-        serializer = FarmSerializer(data=request.data)
-
-        if serializer.is_valid():
-            farm = serializer.save()
-            if request.data['conditions'] != {}:
-                serializer.update(farm, request.data)
-
-            data = {
-                "success": True,
-                "data": request.data
-            }
-            data['data'].pop('conditions')
-        else:
-            data = {
-                "success": True,
-                "message": serializer.errors["non_field_errors"][0]
-            }
-        return Response(data)
-
 
 class FarmGetAll(APIView):
     def get(self, request):
@@ -37,3 +16,39 @@ class FarmGetAll(APIView):
             'success': True,
             "data": farms
         })
+class FarmCreate(APIView):
+    def post(self, request):
+        serializer = FarmSerializer(data=request.data)
+
+        if serializer.is_valid():
+            farm = serializer.save()
+            request.data.pop('conditions')
+            data = {
+                "success": True,
+                "data": request.data
+            }
+            # data['data'].pop('conditions')
+        else:
+            data = {
+                "success": True,
+                "message": serializer.errors["non_field_errors"][0]
+            }
+        return Response(data)
+
+
+    
+class FarmEdit(APIView):
+    def post(self, request):
+        serializer = FarmSerializer(data=request.data)
+        old_farm = Farm.objects.filter(id=request.data['id'])
+        if serializer.is_valid() and old_farm:
+            print("VALID")
+            serializer.update(old_farm[0], request.data)
+        else:
+            print(serializer.errors)
+
+        return Response({
+            'success':True
+        })
+
+

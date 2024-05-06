@@ -48,7 +48,7 @@ class Farm(models.Model):
 
 
 class FarmConditions(models.Model):
-    farm_id = models.ForeignKey(Farm, on_delete=models.CASCADE)
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
     condition_type = models.CharField(
         max_length=15, null=False)
     condition_rule = models.CharField(

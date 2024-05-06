@@ -18,30 +18,56 @@ class FarmSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        print("CREATE")
-        print(validated_data)
-        validated_data.pop('conditions')
-        farm = Farm.objects.create(**validated_data)
+        try:
+            farm = Farm.objects.create(title=validated_data['title'],
+                                       location=validated_data['location'],
+                                       image=validated_data['image'],
+                                       product_id=validated_data['product_id'], user_id=validated_data['user_id'])
+
+            if farm:
+                for type in validated_data['conditions']:
+                    if type in Condition_Type:
+                        if validated_data['conditions'][type]['rule'] in Condition_Rule:
+                            FarmConditions.objects.create(
+                                farm_id=farm, notify_at=validated_data['conditions'][type]['value'],
+                                condition_type=type, condition_rule=validated_data['conditions'][type]['rule'],)
+                        else:
+                            farm.delete()
+                            raise serializers.ValidationError(
+                                "Wrong Rule Type")
+                    else:
+                        farm.delete()
+                        raise serializers.ValidationError(
+                            "Wrong Condition Type")
+        except:
+            farm.delete()
         return farm.id
 
         # return True
 
     def update(self, instance, validated_data):
-        farm = Farm.objects.get(id=instance)
-        for type in validated_data['conditions']:
-            if type in Condition_Type:
-                if validated_data['conditions'][type]['rule']  in Condition_Rule:
-                    FarmConditions.objects.create(
-                        farm_id=farm, notify_at=validated_data['conditions'][type]['value'], 
-                        condition_type=type, condition_rule=validated_data['conditions'][type]['rule'],)
-                else:
-                    farm.delete()
-                    raise serializers.ValidationError("Wrong Rule Type")
-            else:
-                farm.delete()
-                raise serializers.ValidationError("Wrong Condition Type")
-        return True
-    
-    
 
-    
+        farm = Farm.objects.update(title=validated_data['title'],
+                                   location=validated_data['location'],
+                                   image=validated_data['image'],
+                                   product_id=validated_data['product_id'], user_id=validated_data['user_id'])
+
+        if farm:
+            farm_condition = FarmConditions.objects.filter(farm_id=farm)
+            print(farm_condition)
+            # for type in validated_data['conditions']:
+            #     if type in Condition_Type:
+            #         if validated_data['conditions'][type]['rule'] in Condition_Rule:
+            #             FarmConditions.objects.create(
+            #                 farm_id=farm, notify_at=validated_data['conditions'][type]['value'],
+            #                 condition_type=type, condition_rule=validated_data['conditions'][type]['rule'],)
+            #         else:
+            #             farm.delete()
+            #             raise serializers.ValidationError(
+            #                 "Wrong Rule Type")
+            #     else:
+            #         farm.delete()
+            #         raise serializers.ValidationError(
+            #             "Wrong Condition Type")
+
+        return instance.id
