@@ -53,6 +53,7 @@ class CheckRemoteSystem(APIView):
         
                 else:
                     continue
+        token_raspi = None
         return Response({instantData},status=status.HTTP_200_OK)
         
         

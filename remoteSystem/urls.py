@@ -12,7 +12,5 @@ urlpatterns = [
     path("check_data/",views.CheckRemoteSystem.as_view(),name='checkflag'),
     path('sendData/',views.GetInstantDataSystem.as_view(),name='instantData'),
     path("checktokenRaspi/",views.CheckFlagSystem.as_view(),name="checkToken")
-    
-    
-    
+
 ]
