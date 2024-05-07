@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.core import serializers as django_serializers
 from .serializer import FarmSerializer
 from .models import Farm
+from customUsers.models import CustomToken
 import json
 
 
@@ -19,6 +20,8 @@ class FarmGetAll(APIView):
 
 class FarmGetUser(APIView):
     def get(self, request, user_id):
+        token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        userid = CustomToken.objects.get(token=token).custom_user_id
         farms = Farm.objects.filter(user_id=user_id)
         farms = [farm.serialize() for farm in farms]
 
