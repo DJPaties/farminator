@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core import serializers as django_serializers
 from .serializer import FarmSerializer
-from .models import Farm
+from .models import Farm, FarmConditions
 from customUsers.models import CustomToken
 import json
 
@@ -35,21 +35,21 @@ class FarmCreate(APIView):
     def post(self, request):
         # token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
         # user_id = CustomToken.objects.get(token=token).custom_user_id
-        
-        print(request.data['conditions'])
+
         serializer = FarmSerializer(data=request.data)
 
         if serializer.is_valid():
             farm = serializer.save()
-            # request.data.pop('conditions')
+            requestData = request.data
+            requestData['id'] = farm
             data = {
                 "success": True,
-                "data": request.data
+                "data": requestData
             }
             # data['data'].pop('conditions')
         else:
             data = {
-                "success": True,
+                "error": True,
                 "message": serializer.errors
             }
         return Response(data)
@@ -60,11 +60,27 @@ class FarmEdit(APIView):
         serializer = FarmSerializer(data=request.data)
         old_farm = Farm.objects.filter(id=request.data['id'])
         if serializer.is_valid() and old_farm:
-            print("VALID")
             serializer.update(old_farm[0], request.data)
         else:
             print(serializer.errors)
 
+        requestData = request.data
+        requestData.pop("conditions")
         return Response({
-            'success': True
+            'success': True,
+            'data': requestData,
+
+        })
+
+    def get(self, request, farm_id):
+        print(farm_id)
+        farm = Farm.objects.get(id=farm_id)
+        conditons = FarmConditions.objects.filter(farm_id_id=36)
+        data = farm.serialize()
+
+        data['conditions'] = [condition.serialize() for condition in conditons]
+
+        return Response({
+            'success': True,
+            "data": data,
         })

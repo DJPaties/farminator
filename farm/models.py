@@ -64,7 +64,7 @@ class FarmConditions(models.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "farm_id_id": self.farm_id,
+            "farm_id_id": self.farm_id_id,
             "condition_type": self.condition_type,
             "condition_rule": self.condition_rule,
             "notify_at": self.notify_at
