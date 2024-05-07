@@ -22,7 +22,8 @@ class FarmSerializer(serializers.Serializer):
             farm = Farm.objects.create(title=validated_data['title'],
                                        location=validated_data['location'],
                                        image=validated_data['image'],
-                                       product_id=validated_data['product_id'], user_id=validated_data['user_id'])
+                                       product_id=validated_data['product_id'], 
+                                       user_id=validated_data['user_id'])
 
             if farm:
                 for type in validated_data['conditions']:

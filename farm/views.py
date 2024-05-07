@@ -19,9 +19,9 @@ class FarmGetAll(APIView):
 
 
 class FarmGetUser(APIView):
-    def get(self, request, user_id):
+    def get(self, request):
         token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-        userid = CustomToken.objects.get(token=token).custom_user_id
+        user_id = CustomToken.objects.get(token=token).custom_user_id
         farms = Farm.objects.filter(user_id=user_id)
         farms = [farm.serialize() for farm in farms]
 
@@ -33,7 +33,10 @@ class FarmGetUser(APIView):
 
 class FarmCreate(APIView):
     def post(self, request):
-        serializer = FarmSerializer(data=request.data)
+        token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+        user_id = CustomToken.objects.get(token=token).custom_user_id
+        
+        serializer = FarmSerializer(data=request.data,)
 
         if serializer.is_valid():
             farm = serializer.save()
