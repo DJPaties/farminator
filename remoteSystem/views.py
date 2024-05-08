@@ -6,7 +6,7 @@ from .serializer import RemoteSystemRegisterSerializer
 
 from rest_framework.views import APIView
 from .models import RemoteSystemRegister
-
+import json 
 token_raspi = None
 instantData = {}
 class AuthenticateSystem(APIView):
@@ -44,6 +44,8 @@ class CheckFlagSystem(APIView):
 class CheckRemoteSystem(APIView):
     def post(self,request):
         global token_raspi
+        global instantData
+        instantData = {}
         token_raspi = request.data['token_system']
         token_check = request.data['token_system']
         while True:
@@ -54,7 +56,8 @@ class CheckRemoteSystem(APIView):
                 else:
                     continue
         token_raspi = None
-        return Response({instantData},status=status.HTTP_200_OK)
+        
+        return Response({json.dumps(instantData)},status=status.HTTP_200_OK)
         
         
 class GetInstantDataSystem(APIView):
