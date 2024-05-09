@@ -1,5 +1,5 @@
 from django.db import models
-from customUsers.models import CustomUser
+from users.models import CustomUser
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 # Create your models here.
@@ -45,7 +45,7 @@ class Farm(models.Model):
             "id": self.id,
             "title": self.title,
             "location": self.location,
-            "image": self.image.path,
+            "image": self.image,
             "product_id": self.product_id
         }
 

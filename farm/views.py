@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core import serializers as django_serializers
-from rest_framework.parsers import MultiPartParser, FormParser
 from .serializer import FarmSerializer
 from .models import Farm, FarmConditions
-from customUsers.models import CustomToken
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
 import json
 
 
@@ -19,11 +19,23 @@ class FarmGetAll(APIView):
         })
 
 
+# class FarmGetUser(APIView):
+#     def get(self, request):
+#         token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
+#         user_id = CustomToken.objects.get(token=token).custom_user_id
+#         farms = Farm.objects.filter(user_id=user_id)
+#         farms = [farm.serialize() for farm in farms]
+
+#         return Response({
+#             'success': True,
+#             'data': farms,
+#         })
+
 class FarmGetUser(APIView):
     def get(self, request):
-        token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-        user_id = CustomToken.objects.get(token=token).custom_user_id
-        farms = Farm.objects.filter(user_id=user_id)
+        user = request.user
+        # user_id = CustomToken.objects.get(token=token).custom_user_id
+        farms = Farm.objects.filter(user_id=user.id)
         farms = [farm.serialize() for farm in farms]
 
         return Response({

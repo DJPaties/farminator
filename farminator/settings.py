@@ -10,10 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-import os
 from pathlib import Path
-from firebase_admin import initialize_app, credentials
-from google.auth import load_credentials_from_file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +34,7 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '172.19.128.32',
                  '192.168.100.10',
                  '192.168.0.101',
-                 '192.168.0.104',
+                 '192.168.224.31'
                  ]
 
 
@@ -46,14 +43,16 @@ ALLOWED_HOSTS = ['192.168.0.100',
 INSTALLED_APPS = [
     'remoteSystem.apps.RemotesystemConfig',
     'farm.apps.FarmConfig',
-    'customUsers.apps.CustomusersConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'fcm_django',
+     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -116,8 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# AUTH_USER_MODEL = 'customUsers.customUser'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -134,44 +131,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'farm/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'farm/static')
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-class CustomFirebaseCredentials(credentials.ApplicationDefault):
-    def __init__(self, account_file_path: str):
-        super().__init__()
-        self._account_file_path = account_file_path
-
-    def _load_credential(self):
-        if not self._g_credential:
-            self._g_credential, self._project_id = load_credentials_from_file(self._account_file_path,
-                                                                              scopes=credentials._scopes)
-
-
-custom_credentials = CustomFirebaseCredentials(
-    "C:/Users/youss/Documents/Youssof/LIU/CENG495 - Senior Project/backend/farminator/senior-project-8889a-firebase-adminsdk-37fcr-71765f7128.json")
-FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
-
-FCM_DJANGO_SETTINGS = {
-    # an instance of firebase_admin.App to be used as default for all fcm-django requests
-    # default: None (the default Firebase app)
-    "DEFAULT_FIREBASE_APP": FIREBASE_MESSAGING_APP,
-    # default: _('FCM Django')
-    "APP_VERBOSE_NAME": "What ever name",
-    # true if you want to have only one active device per registered user at a time
-    # default: False
-    "ONE_DEVICE_PER_USER": False,
-    # devices to which notifications cannot be sent,
-    # are deleted upon receiving error response from FCM
-    # default: False
-    "DELETE_INACTIVE_DEVICES": False,
-}
+AUTH_USER_MODEL = 'users.CustomUser'

@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from customUsers.serializer import CustomUserSerializer
+from users.serializers import UserRegistrationSerializer
 from .models import RemoteSystemRegister
 
 class RemoteSystemRegisterSerializer(serializers.ModelSerializer):
-    user_id_connected = CustomUserSerializer(read_only=True)
+    user_id_connected = UserRegistrationSerializer(read_only=True)
 
     class Meta:
         model = RemoteSystemRegister
