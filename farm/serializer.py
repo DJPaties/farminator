@@ -5,7 +5,10 @@ from .models import CustomUser, Farm, FarmConditions, Condition_Rule, Condition_
 class FarmSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     location = serializers.CharField(max_length=255)
-    image = serializers.CharField(max_length=255)
+    image = serializers.ImageField(max_length=1000000,
+                                   allow_empty_file=False,
+                                   write_only=True,
+                                   use_url=False)
     user_id = serializers.CharField()
     product_id = serializers.CharField(max_length=255)
     conditions = serializers.JSONField()
@@ -19,10 +22,11 @@ class FarmSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         try:
+            
             farm = Farm.objects.create(title=validated_data['title'],
                                        location=validated_data['location'],
                                        image=validated_data['image'],
-                                       product_id=validated_data['product_id'], 
+                                       product_id=validated_data['product_id'],
                                        user_id=validated_data['user_id'])
 
             if farm:
@@ -42,7 +46,7 @@ class FarmSerializer(serializers.Serializer):
                             "Wrong Condition Type")
         except:
             farm.delete()
-        return farm.id
+        return farm
 
         # return True
 

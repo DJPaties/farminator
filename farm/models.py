@@ -29,7 +29,7 @@ Condition_Rule = [
 class Farm(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    image = models.ImageField(max_length=1000000, upload_to='farms/',
+    image = models.ImageField(max_length=1000000, upload_to='farm/static/',
                               storage=FileSystemStorage(location=settings.STATIC_ROOT))
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product_id = models.CharField(max_length=255)

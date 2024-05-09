@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,7 +35,8 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '172.19.128.32',
                  '192.168.100.10',
                  '192.168.0.101',
-                 '192.168.224.31'
+                 '192.168.224.31',
+                 '192.168.0.104',
                  ]
 
 
@@ -50,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
+    'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt'
 ]
@@ -132,6 +134,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# STATIC_URL = 'farm/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'farm/static')
+
+# MEDIA_URL = 'media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

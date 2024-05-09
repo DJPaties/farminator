@@ -53,7 +53,6 @@ class FarmCreate(APIView):
 
         if serializer.is_valid():
             requestData = request.data
-
             farm = serializer.save()
 
             requestData['id'] = farm.id
