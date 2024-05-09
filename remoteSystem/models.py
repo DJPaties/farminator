@@ -1,5 +1,5 @@
 from django.db import models
-from customUsers.models import CustomUser
+from users.models import CustomUser
 
 class RemoteSystemRegister(models.Model):
     class Meta:
