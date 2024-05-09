@@ -40,12 +40,13 @@ class FarmCreate(APIView):
         serializer = FarmSerializer(data=request.data)
 
         if serializer.is_valid():
-            farm = serializer.save()
             requestData = request.data
-            print(requestData)
-            
-            requestData['id'] = farm
-            requestData['image'] = 'code_space.png'
+
+            farm = serializer.save()
+
+            requestData['id'] = farm.id
+            requestData['image'] = farm.image.name
+
             data = {
                 "success": True,
                 "data": requestData

@@ -32,7 +32,6 @@ class FarmSerializer(serializers.Serializer):
                                        product_id=validated_data['product_id'],
                                        user_id=validated_data['user_id']
                                        )
-
             if farm:
                 for type in validated_data['conditions']:
                     if type in Condition_Type:
@@ -50,7 +49,7 @@ class FarmSerializer(serializers.Serializer):
                             "Wrong Condition Type")
         except:
             farm.delete()
-        return farm.id
+        return farm
 
         # return True
 
