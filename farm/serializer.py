@@ -1,11 +1,17 @@
 from rest_framework import serializers
 from .models import CustomUser, Farm, FarmConditions, Condition_Rule, Condition_Type
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 class FarmSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     location = serializers.CharField(max_length=255)
-    image = serializers.CharField(max_length=255)
+    image = serializers.ImageField(max_length=1000000,
+                                   allow_empty_file=False,
+                                   write_only=True)
     user_id = serializers.CharField()
     product_id = serializers.CharField(max_length=255)
     conditions = serializers.JSONField()
@@ -19,11 +25,13 @@ class FarmSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         try:
-            farm = Farm.objects.create(title=validated_data['title'],
+            farm = Farm.objects.create(
+                title=validated_data['title'],
                                        location=validated_data['location'],
                                        image=validated_data['image'],
-                                       product_id=validated_data['product_id'], 
-                                       user_id=validated_data['user_id'])
+                                       product_id=validated_data['product_id'],
+                                       user_id=validated_data['user_id']
+                                       )
 
             if farm:
                 for type in validated_data['conditions']:

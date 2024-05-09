@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core import serializers as django_serializers
+from rest_framework.parsers import MultiPartParser, FormParser
 from .serializer import FarmSerializer
 from .models import Farm, FarmConditions
 from customUsers.models import CustomToken
@@ -32,16 +33,19 @@ class FarmGetUser(APIView):
 
 
 class FarmCreate(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     def post(self, request):
         # token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-        # user_id = CustomToken.objects.get(token=token).custom_user_id
-
+        # user_id = CustomToken.objects.get(token=
         serializer = FarmSerializer(data=request.data)
 
         if serializer.is_valid():
             farm = serializer.save()
             requestData = request.data
+            print(requestData)
+            
             requestData['id'] = farm
+            requestData['image'] = 'code_space.png'
             data = {
                 "success": True,
                 "data": requestData

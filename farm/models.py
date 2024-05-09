@@ -1,5 +1,7 @@
 from django.db import models
 from customUsers.models import CustomUser
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 # Create your models here.
 
 
@@ -27,7 +29,8 @@ Condition_Rule = [
 class Farm(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    image = models.CharField(max_length=255)
+    image = models.ImageField(max_length=1000000, upload_to='farms/',
+                              storage=FileSystemStorage(location=settings.STATIC_ROOT))
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product_id = models.CharField(max_length=255)
 
@@ -42,7 +45,7 @@ class Farm(models.Model):
             "id": self.id,
             "title": self.title,
             "location": self.location,
-            "image": self.image,
+            "image": self.image.path,
             "product_id": self.product_id
         }
 
@@ -60,7 +63,7 @@ class FarmConditions(models.Model):
 
     def __str__(self) -> str:
         return Farm.objects.get(id=self.farm_id)
-    
+
     def serialize(self):
         return {
             "id": self.id,
