@@ -2,6 +2,8 @@ from django.db import models
 from users.models import CustomUser
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+import os 
+import uuid
 # Create your models here.
 
 
@@ -25,11 +27,15 @@ Condition_Rule = [
     'less_than',
 ]
 
+def get_image_upload_path(instance, filename):
+    unique_filename = str(uuid.uuid4())[:8]
+    ext = os.path.splitext(filename)[1]
+    return os.path.join('farm/static/', f'{instance.title}_{unique_filename}{ext}')
 
 class Farm(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    image = models.ImageField(max_length=1000000, upload_to='farm/static/',
+    image = models.ImageField(max_length=1000000, upload_to=get_image_upload_path,
                               storage=FileSystemStorage(location=settings.STATIC_ROOT))
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product_id = models.CharField(max_length=255)
@@ -39,13 +45,13 @@ class Farm(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
+    
     def serialize(self):
         return {
             "id": self.id,
             "title": self.title,
             "location": self.location,
-            "image": self.image,
+            "image": self.image.url.split('/')[1],
             "product_id": self.product_id
         }
 

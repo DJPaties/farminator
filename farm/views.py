@@ -62,6 +62,7 @@ class FarmCreate(APIView):
                 "success": True,
                 "data": requestData
             }
+            data['data']['image'] ="/".join (data['data']['image'].split("/")[-2:])
             # data['data'].pop('conditions')
         else:
             data = {
