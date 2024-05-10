@@ -5,6 +5,7 @@ from django.core import serializers as django_serializers
 from .serializer import FarmSerializer
 from .models import Farm, FarmConditions
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import json
 
@@ -32,10 +33,11 @@ class FarmGetAll(APIView):
 #         })
 
 class FarmGetUser(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
-        print(user)
-        # user_id = CustomToken.objects.get(token=token).custom_user_id
         farms = Farm.objects.filter(user_id_id=user.id)
         farms = [farm.serialize() for farm in farms]
 
@@ -47,10 +49,11 @@ class FarmGetUser(APIView):
 
 class FarmCreate(APIView):
     parser_classes = (MultiPartParser, FormParser)
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
-        # token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-        # user_id = CustomToken.objects.get(token=
+        requestData = request.data
+        requestData['user_id'] = request.user.id
         serializer = FarmSerializer(data=request.data)
 
         if serializer.is_valid():

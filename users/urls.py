@@ -9,5 +9,7 @@ urlpatterns = [
     path("login/", views.CustomObtainAuthToken.as_view(), name="login"),
     path("logout_user/", views.UserLogoutView.as_view(), name="logout_user"),
     path("register/", views.UserRegistrationView.as_view(), name="register"),
+
+    path('validate-token/', views.ValidateTokenView.as_view(), name='validate_token'),
     # path("getuser/",views.get_user_token,name='getUser')
 ]

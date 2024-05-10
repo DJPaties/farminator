@@ -51,7 +51,7 @@ class Farm(models.Model):
             "id": self.id,
             "title": self.title,
             "location": self.location,
-            "image": self.image.url.split('/')[1],
+            "image": "/".join(self.image.url.split("/")[-2:]),
             "product_id": self.product_id
         }
 

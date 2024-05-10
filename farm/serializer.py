@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser, Farm, FarmConditions, Condition_Rule, Condition_Type
+import json
 
 
 class FarmSerializer(serializers.Serializer):
@@ -11,18 +12,19 @@ class FarmSerializer(serializers.Serializer):
                                    use_url=False)
     user_id = serializers.CharField()
     product_id = serializers.CharField(max_length=255)
-    conditions = serializers.JSONField()
+    conditions = serializers.CharField()
 
     def validate(self, attrs):
         user = CustomUser.objects.filter(id=attrs['user_id'])
         if not user:
             raise serializers.ValidationError("User Not Found, Please Login")
         attrs['user_id'] = user[0]
+        conditions = attrs['conditions']
+        attrs['conditions'] = json.loads(conditions)
         return attrs
 
     def create(self, validated_data):
         try:
-            
             farm = Farm.objects.create(title=validated_data['title'],
                                        location=validated_data['location'],
                                        image=validated_data['image'],
