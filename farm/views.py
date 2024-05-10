@@ -34,8 +34,9 @@ class FarmGetAll(APIView):
 class FarmGetUser(APIView):
     def get(self, request):
         user = request.user
+        print(user)
         # user_id = CustomToken.objects.get(token=token).custom_user_id
-        farms = Farm.objects.filter(user_id=user.id)
+        farms = Farm.objects.filter(user_id_id=user.id)
         farms = [farm.serialize() for farm in farms]
 
         return Response({
@@ -46,6 +47,7 @@ class FarmGetUser(APIView):
 
 class FarmCreate(APIView):
     parser_classes = (MultiPartParser, FormParser)
+
     def post(self, request):
         # token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
         # user_id = CustomToken.objects.get(token=
@@ -62,7 +64,8 @@ class FarmCreate(APIView):
                 "success": True,
                 "data": requestData
             }
-            data['data']['image'] ="/".join (data['data']['image'].split("/")[-2:])
+            data['data']['image'] = "/".join(data['data']
+                                             ['image'].split("/")[-2:])
             # data['data'].pop('conditions')
         else:
             data = {
