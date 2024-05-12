@@ -9,6 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from fcm_django.models import FCMDevice
 from .models import CustomUser
 
 
@@ -16,9 +17,16 @@ class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
             data=request.data, context={'request': request})
+        print(request.data['fcm_token'])
         data = {}
         if (serializer.is_valid()):
             user = serializer.validated_data['user']
+            device = FCMDevice.objects.get(
+                registration_id=request.data['fcm_token'])
+            if not device:
+                FCMDevice.objects.create(
+                    user=user, registration_id=request.data['fcm_token'])
+
             token, created = Token.objects.get_or_create(user=user)
             data = request.data
             data._mutable = True
@@ -57,7 +65,8 @@ class UserLogoutView(APIView):
         # Delete the token
         token.delete()
         return Response({'message': 'Logged out successfully.'}, status=status.HTTP_200_OK)
-    
+
+
 class ValidateTokenView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

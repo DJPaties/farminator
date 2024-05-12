@@ -68,7 +68,7 @@ class FarmConditions(models.Model):
         db_table = 'conditions'
 
     def __str__(self) -> str:
-        return Farm.objects.get(id=self.farm_id)
+        return str(self.id)
 
     def serialize(self):
         return {

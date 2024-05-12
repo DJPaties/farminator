@@ -53,30 +53,26 @@ class FarmSerializer(serializers.Serializer):
         # return True
 
     def update(self, instance, validated_data):
-
-        farm = Farm.objects.get(id=validated_data['id'])
+        farm = Farm.objects.get(id=instance.id)
         farm.title = validated_data['title']
         farm.location = validated_data['location']
         farm.image = validated_data['image']
         farm.product_id = validated_data['product_id']
-        farm.user_id = CustomUser.objects.get(id=validated_data['user_id'])
-
         if farm:
-            farm.save()
-            for i in validated_data['conditions']:
-                try:
-                    farm_condition = FarmConditions.objects.get(
-                        farm_id_id=validated_data['id'], condition_type=i)
-                    print(farm_condition.serialize())
-                    farm_condition.farm_id_id = validated_data['id']
-                    farm_condition.condition_type = i
-                    farm_condition.condition_rule = validated_data['conditions'][i]['rule']
-                    farm_condition.notify_at = validated_data['conditions'][i]['value']
-
-                    farm_condition.save()
-                except:
-                    FarmConditions.objects.create(
-                        farm_id_id=validated_data['id'], notify_at=validated_data['conditions'][i]['value'],
-                        condition_type=i, condition_rule=validated_data['conditions'][i]['rule'],)
-
-        return instance.id
+            FarmConditions.objects.filter(farm_id_id=farm.id).delete()
+            for type in validated_data['conditions']:
+                if type in Condition_Type:
+                    if validated_data['conditions'][type]['rule'] in Condition_Rule:
+                        FarmConditions.objects.create(
+                            farm_id=farm, notify_at=validated_data['conditions'][type]['value'],
+                            condition_type=type, condition_rule=validated_data['conditions'][type]['rule'],)
+                    else:
+                        farm.delete()
+                        raise serializers.ValidationError(
+                            "Wrong Rule Type")
+                else:
+                    farm.delete()
+                    raise serializers.ValidationError(
+                        "Wrong Condition Type")
+        farm.save()
+        return farm

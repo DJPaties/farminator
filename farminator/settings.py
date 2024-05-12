@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from firebase_admin import initialize_app, credentials
+from google.auth import load_credentials_from_file
 from pathlib import Path
 import os
 
@@ -38,6 +40,7 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '192.168.224.31',
                  '192.168.0.104',
                  '192.168.148.10',
+                 '192.168.0.103',
                  ]
 
 
@@ -55,7 +58,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'fcm_django',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +151,34 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
+
+
+class CustomFirebaseCredentials(credentials.ApplicationDefault):
+    def __init__(self, account_file_path: str):
+        super().__init__()
+        self._account_file_path = account_file_path
+
+    def _load_credential(self):
+        if not self._g_credential:
+            self._g_credential, self._project_id = load_credentials_from_file(self._account_file_path,
+                                                                              scopes=credentials._scopes)
+
+
+custom_credentials = CustomFirebaseCredentials(
+    './senior-project-8889a-firebase-adminsdk-37fcr-71765f7128.json')
+FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
+
+FCM_DJANGO_SETTINGS = {
+    # an instance of firebase_admin.App to be used as default for all fcm-django requests
+    # default: None (the default Firebase app)
+    "DEFAULT_FIREBASE_APP": FIREBASE_MESSAGING_APP,
+    # default: _('FCM Django')
+    "APP_VERBOSE_NAME": "What ever name",
+    # true if you want to have only one active device per registered user at a time
+    # default: False
+    "ONE_DEVICE_PER_USER": False,
+    # devices to which notifications cannot be sent,
+    # are deleted upon receiving error response from FCM
+    # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+}

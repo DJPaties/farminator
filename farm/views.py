@@ -20,18 +20,6 @@ class FarmGetAll(APIView):
         })
 
 
-# class FarmGetUser(APIView):
-#     def get(self, request):
-#         token = request.META['HTTP_AUTHORIZATION'].split(' ')[1]
-#         user_id = CustomToken.objects.get(token=token).custom_user_id
-#         farms = Farm.objects.filter(user_id=user_id)
-#         farms = [farm.serialize() for farm in farms]
-
-#         return Response({
-#             'success': True,
-#             'data': farms,
-#         })
-
 class FarmGetUser(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -51,12 +39,14 @@ class FarmCreate(APIView):
     parser_classes = (MultiPartParser, FormParser)
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         requestData = request.data
         requestData['user_id'] = request.user.id
         serializer = FarmSerializer(data=request.data)
 
         if serializer.is_valid():
+
             requestData = request.data
             farm = serializer.save()
 
@@ -79,31 +69,68 @@ class FarmCreate(APIView):
 
 
 class FarmEdit(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        serializer = FarmSerializer(data=request.data)
+        requestData = request.data
+        requestData._mutable = True
+        requestData['user_id'] = request.user.id
         old_farm = Farm.objects.filter(id=request.data['id'])
+        
+        if ('image' not in requestData.keys()):
+            requestData['image'] = old_farm[0].image
+        serializer = FarmSerializer(data=requestData)
+
         if serializer.is_valid() and old_farm:
-            serializer.update(old_farm[0], request.data)
+            farm = serializer.update(old_farm[0], serializer.validated_data)
+            requestData['id'] = farm.id
+            requestData['image'] = farm.image.name
+
+            data = {
+                "success": True,
+                "data": requestData
+            }
+            data['data']['image'] = "/".join(data['data']
+                                             ['image'].split("/")[-2:])
+            return Response({
+                'success': True,
+                'data': requestData,
+            })
         else:
             print(serializer.errors)
 
-        requestData = request.data
         requestData.pop("conditions")
         return Response({
-            'success': True,
-            'data': requestData,
-
+            'error': True,
+            'message': serializer.errors
         })
 
     def get(self, request, farm_id):
-        print(farm_id)
         farm = Farm.objects.get(id=farm_id)
-        conditons = FarmConditions.objects.filter(farm_id_id=36)
+        conditons = FarmConditions.objects.filter(farm_id_id=farm_id)
         data = farm.serialize()
-
         data['conditions'] = [condition.serialize() for condition in conditons]
 
         return Response({
             'success': True,
             "data": data,
+        })
+
+
+class FarmDelete(APIView):
+    def post(self, request):
+        print(request.data)
+        farm = Farm.objects.filter(id=request.data['id'])
+        print(farm)
+        if farm:
+            farm.delete()
+            return Response({
+                'success': True,
+                'message': 'Farm Deleted Successfully'
+            })
+        return Response({
+            'error': True,
+            'message': 'Farm Not Found!',
         })
