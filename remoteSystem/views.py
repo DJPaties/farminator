@@ -34,7 +34,9 @@ class RegisterSystem(APIView):
         except RemoteSystemRegister.DoesNotExist:
             check_system=RemoteSystemRegister.objects.create(custom_token=token)
             if check_system:
-                return Response({"success":True}, status=status.HTTP_201_CREATED)
+                serilized_system = RemoteSystemRegisterSerializer(check_system)
+                # if serilized_system.is_valid():
+                return Response({"success":True,"data":serilized_system.data}, status=status.HTTP_201_CREATED)
             return Response({"success":False}, status=status.HTTP_400_BAD_REQUEST)
 
 class CheckFlagSystem(APIView):

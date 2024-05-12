@@ -5,8 +5,8 @@ import requests
 import secrets
 import time
 
-def createQR():
-    url = "http://127.0.0.1:8000/register_system/"
+def createQR(product_id):
+    url = product_id
 
     qr = qrcode.QRCode(
         version=1,
@@ -66,10 +66,11 @@ else:
     system_data = {'token': token}
     response = requests.post('http://localhost:8000/system/register/',json=system_data)
     print(response.json())
-    if response.json()['success']:
+    response = response.json()
+    if response['success']:
         with open('token.txt','w') as f:
             f.write(token)
-        createQR()
+        createQR(response['data']['id'])
         
     
     
