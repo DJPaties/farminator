@@ -48,8 +48,9 @@ class CheckRemoteSystem(APIView):
         global token_raspi
         global instantData
         instantData = {}
-        token_raspi = request.data['token_system']
-        token_check = request.data['token_system']
+        system = RemoteSystemRegister.objects.get(id=request.data['farm_product_id'])
+        token_raspi = system.custom_token
+        token_check = system.custom_token
         while True:
             if 'token_system' in instantData:
                 if token_check == instantData['token_system']:
