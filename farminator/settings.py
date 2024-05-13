@@ -41,6 +41,8 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '192.168.0.104',
                  '192.168.148.10',
                  '192.168.0.103',
+                 '192.168.10.239',
+                 '172.19.132.38',
                  ]
 
 
@@ -49,6 +51,7 @@ ALLOWED_HOSTS = ['192.168.0.100',
 INSTALLED_APPS = [
     'remoteSystem.apps.RemotesystemConfig',
     'farm.apps.FarmConfig',
+    'notification.apps.NotificationConfig',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',

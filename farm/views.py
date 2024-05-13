@@ -23,7 +23,6 @@ class FarmGetAll(APIView):
 class FarmGetUser(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
         user = request.user
         farms = Farm.objects.filter(user_id_id=user.id)
@@ -42,6 +41,7 @@ class FarmCreate(APIView):
 
     def post(self, request):
         requestData = request.data
+        requestData._mutable = True
         requestData['user_id'] = request.user.id
         serializer = FarmSerializer(data=request.data)
 
