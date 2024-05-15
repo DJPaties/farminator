@@ -22,4 +22,5 @@ urlpatterns = [
     path('farms/', include('farm.urls')),
     path('system/', include('remoteSystem.urls')),
     path('notification/', include('notification.urls')),
+    path('reminder/', include('reminder.urls')),
 ]

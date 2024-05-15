@@ -3,24 +3,23 @@ from users.models import CustomUser
 from farm.models import Farm
 
 
-class Notification(models.Model):
-    title = models.CharField(max_length=255)
+class Reminder(models.Model):
     description = models.CharField(max_length=10000)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
-    created_at = models.DateField(auto_now=True)
+    type = models.CharField(max_length=255)
+    date_time = models.DateTimeField()
 
     class Meta:
-        db_table = 'notification'
+        db_table = 'reminder'
 
     def __str__(self) -> str:
-        return self.title
+        return self.farm_id
 
     def serialize(self):
         return {
-            'title': self.title,
             'description': self.description,
             'user_id': self.user_id,
             'farm': self.farm.title,
-            'created_at': self.created_at,
+            'date_time': self.date_time,
         }

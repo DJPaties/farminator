@@ -43,7 +43,8 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '192.168.0.103',
                  '192.168.10.239',
                  '172.19.132.38',
-                 
+                 '192.168.242.10',
+                 '192.168.137.1',
                  ]
 
 
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'remoteSystem.apps.RemotesystemConfig',
     'farm.apps.FarmConfig',
     'notification.apps.NotificationConfig',
+    'reminder.apps.ReminderConfig',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,7 +66,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'fcm_django',
+    'django_apscheduler',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,6 +79,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'farminator.urls'
 

@@ -50,8 +50,6 @@ class NotificationCreate(APIView):
                         body=requestData['description']
                     ),
                 ),
-                # this is optional
-                # app=settings.FCM_DJANGO_SETTINGS['DEFAULT_FIREBASE_APP']
             )
         else:
             data = {
