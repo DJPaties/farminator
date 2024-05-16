@@ -1,25 +1,36 @@
 #include <DHT11.h>
-#define DHT11PIN 4
+#include <ArduinoJson.h>
 
-DHT11 dht11(4); // Create an instance of the DHT11 class with pin 4 as the parameter.
+#define DHT11PIN 8
 
-const int trigPin = 9;  
-const int echoPin = 10; 
+DHT11 dht11(8);
 
-float duration, distance;  
+const int trigPin = 9;
+const int echoPin = 10;
+const int waterPumpPin = 7;
+const int waterPlantPin = 6;
+const int UVPin = 5;
+const int acPin = 4;
+const int heaterPin = 3;
+float duration, distance;
 
 
 void setup() {
-  Serial.begin(9600); // Initialize serial communication at 9600 baud rate.
-  pinMode(A0, INPUT); // Set pin A0 as INPUT for reading moisture level.
-  pinMode(trigPin, OUTPUT); // Set trigPin as OUTPUT for ultrasonic sensor.
-  pinMode(echoPin, INPUT);  // Set echoPin as INPUT for ultrasonic sensor.
+  Serial.begin(9600);
+  pinMode(A0, INPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(waterPumpPin, OUTPUT);
+  pinMode(waterPlantPin, OUTPUT);
+  pinMode(UVPin, OUTPUT);
+  pinMode(acPin, OUTPUT);
+  pinMode(heaterPin, OUTPUT);
 
+  pinMode(echoPin, INPUT);
 }
 
-void   loop() {
-  int currentMoistureLevel = analogRead(A0); // Read the moisture level from pin A0.
-  
+void loop() {
+  int currentMoistureLevel = analogRead(A0);
+
   int temperature = 0;
   int humidity = 0;
 
@@ -30,25 +41,84 @@ void   loop() {
   // If the reading is successful, print the temperature and humidity values.
   // If there are errors, print the appropriate error messages.
 
-  digitalWrite(trigPin, LOW); // Set trigPin to LOW state.
-  delayMicroseconds(2); // Wait for 2 microseconds.
-  digitalWrite(trigPin, HIGH); // Set trigPin to HIGH state.
-  delayMicroseconds(10); // Wait for 10 microseconds.
-  digitalWrite(trigPin, LOW); // Set trigPin to LOW state.
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
 
-  duration = pulseIn(echoPin, HIGH); // Read the duration of the pulse from echoPin.
-  distance = (duration*.0343)/2; // Calculate distance based on the duration of the pulse.
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration * .0343) / 2;
 
-  //distance = map(distance, 0, 300, 0, 100); // Optional mapping of distance.
-  //currentMoistureLevel =  map(currentMoistureLevel, 0, 1023, 100, 0); // Optional mapping of moisture level.
+  //distance = map(distance, 0, 300, 0, 100);
+  //currentMoistureLevel =  map(currentMoistureLevel, 0, 1023, 100, 0);
 
-  //delay(2000); // Optional delay.
+  //delay(2000);
 
-  if (result == 0){
-    Serial.print(currentMoistureLevel); // Print current moisture level.
+
+  if (result == 0) {
+    Serial.print(currentMoistureLevel);
     Serial.print(";");
-    Serial.print(temperature); // Print temperature.
+    Serial.print(temperature);
     Serial.print(";");
-    Serial.println(distance); // Print distance.
-  }//delay(200); // Optional delay.
+    Serial.println(distance);
+  }  //delay(200);
+
+
+  if (Serial.available() > 0) {
+    // Read the incoming data
+    String jsonString = Serial.readStringUntil('\n');
+
+    // Parse JSON
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, jsonString);
+
+    // Check for parsing errors
+    if (error) {
+      //Serial.print(F("Error parsing JSON: "));
+      //Serial.println(error.c_str());
+      return;
+    }
+
+
+    // Get the value of the 'success' key as a string
+    String waterPumpValue = doc["water_pump"];
+    String waterPlantValue = doc["water_plant"];
+    String lampValue = doc["lamp"];
+    String acValue = doc["ac"];
+    String heaterValue = doc["heater"];
+
+    if (waterPumpValue == "true") {
+      
+      digitalWrite(waterPumpPin, HIGH);
+    }
+    if (waterPumpValue == "false") {
+      digitalWrite(waterPumpPin, LOW);
+    }
+    if (waterPlantValue == "true") {
+      digitalWrite(waterPlantPin, HIGH);
+    }
+    if (waterPlantValue == "false") {
+      digitalWrite(waterPlantPin, LOW);
+    }
+    if (lampValue == "true") {
+      digitalWrite(UVPin, HIGH);
+    }
+    if (lampValue == "false") {
+      digitalWrite(UVPin, LOW);
+    }
+    if (acValue == "true") {
+      digitalWrite(acPin, HIGH);
+    }
+    if (acValue == "false") {
+      digitalWrite(acPin, LOW);
+    }
+    if (heaterValue == "true") {
+      digitalWrite(heaterPin, HIGH);
+    }
+    if (heaterValue == "false") {
+      digitalWrite(heaterPin, LOW);
+    }
+    //digitalWrite(waterPlantPin, HIGH);
+  }
 }
