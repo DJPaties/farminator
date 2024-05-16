@@ -9,6 +9,8 @@ from .models import RemoteSystemRegister
 import json 
 token_raspi = None
 instantData = {}
+condition_list = {}
+condition_flag = False
 class AuthenticateSystem(APIView):
     def post(self,request):
         token = request.data['token']
@@ -41,7 +43,9 @@ class RegisterSystem(APIView):
 
 class CheckFlagSystem(APIView):
     def post(self,request):
-        return Response({"token_system":token_raspi},status=status.HTTP_200_OK)
+        return Response({"token_system":token_raspi,
+                         'condition_flag':condition_flag
+                         },status=status.HTTP_200_OK)
 
 class CheckRemoteSystem(APIView):
     def post(self,request):
@@ -54,6 +58,28 @@ class CheckRemoteSystem(APIView):
         while True:
             if 'token_system' in instantData:
                 if token_check == instantData['token_system']:
+                    break
+        
+                else:
+                    continue
+        token_raspi = None
+        
+        return Response({json.dumps(instantData)},status=status.HTTP_200_OK)
+    
+    
+class CheckConditionSystem(APIView):
+    def post(self,request):
+        global token_raspi
+        global condition_list
+        global condition_flag
+        system = RemoteSystemRegister.objects.get(id=request.data['farm_product_id'])
+        token_raspi = system.custom_token
+        token_check = system.custom_token
+        condition_flag = request.data['condition_flag']
+        condition_flag = request.data['data']
+        while True:
+            if 'token_system' in condition_list:
+                if token_check == condition_list['token_system']:
                     break
         
                 else:
