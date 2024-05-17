@@ -9,8 +9,8 @@ from .models import RemoteSystemRegister
 import json 
 token_raspi = None
 instantData = {}
-condition_list = {}
-condition_flag = False
+control_list = {}
+control_flag = False
 class AuthenticateSystem(APIView):
     def post(self,request):
         token = request.data['token']
@@ -43,8 +43,17 @@ class RegisterSystem(APIView):
 
 class CheckFlagSystem(APIView):
     def post(self,request):
-        return Response({"token_system":token_raspi,
-                         'condition_flag':condition_flag
+        global token_raspi
+        global control_list
+        global control_flag
+        data = {"token_system":token_raspi,
+                'control_flag':control_flag,
+                'control_list':control_list
+                        }
+        token_raspi = None
+        control_flag = False
+        control_list = {}
+        return Response({json.dumps(data)
                          },status=status.HTTP_200_OK)
 
 class CheckRemoteSystem(APIView):
@@ -67,26 +76,26 @@ class CheckRemoteSystem(APIView):
         return Response({json.dumps(instantData)},status=status.HTTP_200_OK)
     
     
-class CheckConditionSystem(APIView):
+class CheckControlSystem(APIView):
     def post(self,request):
         global token_raspi
-        global condition_list
-        global condition_flag
+        global control_list
+        global control_flag
         system = RemoteSystemRegister.objects.get(id=request.data['farm_product_id'])
         token_raspi = system.custom_token
         token_check = system.custom_token
-        condition_flag = request.data['condition_flag']
-        condition_flag = request.data['data']
-        while True:
-            if 'token_system' in condition_list:
-                if token_check == condition_list['token_system']:
-                    break
+        control_flag = request.data['control_flag']
+        control_list = request.data['control_list']
+        # while True:
+        #     if 'token_system' in control_list:
+        #         if token_check == control_list['token_system']:
+        #             break
         
-                else:
-                    continue
-        token_raspi = None
-        
-        return Response({json.dumps(instantData)},status=status.HTTP_200_OK)
+        #         else:
+        #             continue
+        # token_raspi = None
+        # control_flag = False
+        return Response({json.dumps(control_list)},status=status.HTTP_200_OK)
         
         
 class GetInstantDataSystem(APIView):

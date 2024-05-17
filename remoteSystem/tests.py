@@ -1,4 +1,5 @@
 from django.test import TestCase
+import json
 import qrcode
 import requests
 # Create your tests here
@@ -78,17 +79,18 @@ else:
 
 import serial
 
+data = [700,25,76]
 def read_serial_data(serial_port):
     # Open serial port
-    ser = serial.Serial(serial_port, baudrate=9600, timeout=1)
-    
+    # ser = serial.Serial(serial_port, baudrate=9600, timeout=1)
+    #
 #  serial port until ';' delimiter is encountered
     try:
         while True:
             # Read data from serial port until newline character is encountered
-            data = ser.readline().decode('utf-8').strip()
+            # data = ser.readline().decode('utf-8').strip()
             
-            data = data.split(';')
+            # data = data.split(';')
             if len(data)>2:
                 soil_moisture = data[0]
                 temperature = data[1]
@@ -99,23 +101,32 @@ def read_serial_data(serial_port):
             print("Received:", data)
             response = requests.post("http://127.0.0.1:8000/system/checktokenRaspi/")
             if response.status_code == 200:
-                response = response.json()
+                response_json = response.json()
+
+                response_str = response_json[0]
+                response = json.loads(response_str)
                 print(response)
+                
                 if response['token_system'] == token: 
-                    instantData = {
-                        'soil_moisture':soil_moisture,
-                        'temperature':temperature,
-                        'distance_water_level':distance_water_level,
+                    if response['control_flag']:
+                        control_list = response['control_list']
+                        print(control_list)
+                    else:
+                        instantData = {
+                            'soil_moisture':soil_moisture,
+                            'temperature':temperature,
+                            'distance_water_level':distance_water_level,
                         'token_system':token
-                    }              
-                    requests.post("http://127.0.0.1:8000/system/sendData/",data=instantData)
+                }              
+                        requests.post("http://127.0.0.1:8000/system/sendData/",data=instantData)
                 else:
                     print("No Flag")
-                    time.sleep(2)
+                time.sleep(2)
             
     except KeyboardInterrupt:
         # Close serial port on KeyboardInterrupt
-        ser.close()
+        exit()
+        # ser.close()
 
 read_serial_data('COM5')
 
