@@ -6,6 +6,8 @@ from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification as noti
 import sys
 from datetime import datetime
+from apscheduler.triggers.cron import CronTrigger
+
 from reminder.models import Reminder
 
 # This is the function you want to schedule - add as many as you want and then register them in the start() function below
@@ -23,13 +25,13 @@ def send_notification_reminder():
             if (now == time):
                 devices = FCMDevice.objects.filter(user=reminder.user)
                 devices.send_message(
-                message=Message(
-                    notification=noti(
-                        title=reminder.farm.title,
-                        body=reminder.description
+                    message=Message(
+                        notification=noti(
+                            title=reminder.farm.title,
+                            body=reminder.description
+                        ),
                     ),
-                ),
-            )
+                )
                 print("NOTIFICATION SENT DAILY")
         elif reminder.type == 'weekly':
             now = now.strftime('%A:%H:%M')
@@ -37,26 +39,26 @@ def send_notification_reminder():
             if (now == time):
                 devices = FCMDevice.objects.filter(user=reminder.user)
                 devices.send_message(
-                message=Message(
-                    notification=noti(
-                        title=reminder.farm.title,
-                        body=reminder.description
+                    message=Message(
+                        notification=noti(
+                            title=reminder.farm.title,
+                            body=reminder.description
+                        ),
                     ),
-                ),
-            )
+                )
         elif reminder.type == 'monthly':
             now = now.strftime('%d:%H:%M')
             time = reminder.date_time.strftime('%d:%H:%M')
             if now == time:
                 devices = FCMDevice.objects.filter(user=reminder.user)
                 devices.send_message(
-                message=Message(
-                    notification=noti(
-                        title=reminder.farm.title,
-                        body=reminder.description
+                    message=Message(
+                        notification=noti(
+                            title=reminder.farm.title,
+                            body=reminder.description
+                        ),
                     ),
-                ),
-            )
+                )
     print("END")
 
 
@@ -66,10 +68,13 @@ def start():
     # scheduler.add_jobstore(DjangoJobStore(), "default")
     # run this job every 24 hours
     try:
-        scheduler.add_job(send_notification_reminder, 'interval', minutes=1)
+        trigger = CronTrigger(
+            year="*", month="*", day="*", hour="*", minute="*", second="0"
+        )
+        scheduler.add_job(send_notification_reminder,
+                          trigger=trigger, minutes=1)
     except Exception as e:
         print(f"Failed to add job: {e}")
         raise
-    register_events(scheduler)
     scheduler.start()
     print("Scheduler started...", file=sys.stdout)
