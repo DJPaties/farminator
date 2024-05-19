@@ -4,13 +4,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import os 
 import uuid
-# Create your models here.
 
-
-water = 'WATER'
-soil = 'SOIL'
-temp = 'TEMP'
-light = 'LIGHT'
 Condition_Type = [
     'water_level',
     'soil_moisture',
@@ -18,9 +12,6 @@ Condition_Type = [
     'light_intensity',
 ]
 
-EQ = 'EQUAL'
-GT = 'GREATER'
-LT = 'LESS'
 Condition_Rule = [
     'equal',
     'greater_than',
@@ -37,7 +28,7 @@ class Farm(models.Model):
     location = models.CharField(max_length=255)
     image = models.ImageField(max_length=1000000, upload_to=get_image_upload_path,
                               storage=FileSystemStorage(location=settings.STATIC_ROOT))
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product_id = models.CharField(max_length=255)
 
     class Meta:
@@ -57,7 +48,7 @@ class Farm(models.Model):
 
 
 class FarmConditions(models.Model):
-    farm_id = models.ForeignKey(Farm, on_delete=models.CASCADE)
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
     condition_type = models.CharField(
         max_length=15, null=False)
     condition_rule = models.CharField(
@@ -73,7 +64,7 @@ class FarmConditions(models.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "farm_id_id": self.farm_id_id,
+            "farm_id": self.farm_id,
             "condition_type": self.condition_type,
             "condition_rule": self.condition_rule,
             "notify_at": self.notify_at

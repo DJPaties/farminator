@@ -46,6 +46,7 @@ ALLOWED_HOSTS = ['192.168.0.100',
                  '172.19.132.38',
                  '192.168.242.10',
                  '192.168.137.1',
+                 '192.168.0.111',
                  ]
 
 
@@ -80,7 +81,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 
 
 ROOT_URLCONF = 'farminator.urls'

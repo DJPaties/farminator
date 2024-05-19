@@ -23,9 +23,10 @@ class FarmGetAll(APIView):
 class FarmGetUser(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
-        farms = Farm.objects.filter(user_id_id=user.id)
+        farms = Farm.objects.filter(user_id=user.id)
         farms = [farm.serialize() for farm in farms]
 
         return Response({
@@ -78,7 +79,7 @@ class FarmEdit(APIView):
         requestData._mutable = True
         requestData['user_id'] = request.user.id
         old_farm = Farm.objects.filter(id=request.data['id'])
-        
+
         if ('image' not in requestData.keys()):
             requestData['image'] = old_farm[0].image
         serializer = FarmSerializer(data=requestData)
@@ -109,7 +110,7 @@ class FarmEdit(APIView):
 
     def get(self, request, farm_id):
         farm = Farm.objects.get(id=farm_id)
-        conditons = FarmConditions.objects.filter(farm_id_id=farm_id)
+        conditons = FarmConditions.objects.filter(farm_id=farm_id)
         data = farm.serialize()
         data['conditions'] = [condition.serialize() for condition in conditons]
 
