@@ -1,64 +1,64 @@
-from django.test import TestCase
+import serial
 import json
-import qrcode
-import requests
-# Create your tests here
-import secrets
 import time
 
-token = "bd7c795f8090e3812d9ecf4964639cecb27d7e34f39903b8d5be6a50527fc4b6"
-    
-    
+# Configure the serial connection
+ser = serial.Serial('COM3', 9600)  # Replace 'COM3' with your Arduino port
 
+def send_json_to_arduino(json_data):
+    ser.write((json_data + '\n').encode())
 
-data = [700,25,76]
-def read_serial_data(serial_port):
-    # Open serial port
-    # ser = serial.Serial(serial_port, baudrate=9600, timeout=1)
-    #
-#  serial port until ';' delimiter is encountered
+def receive_from_arduino():
+    while ser.in_waiting == 0:
+        pass  # Wait until there is data available to read
+    data = ser.readline().decode().strip()
+    return data
+
+# Example usage
+if __name__ == "__main__":
     try:
-        while True:
-            # Read data from serial port until newline character is encountered
-            # data = ser.readline().decode('utf-8').strip()
-            
-            # data = data.split(';')
-            if len(data)>2:
-                soil_moisture = data[0]
-                temperature = data[1]
-                distance_water_level = data[2]
-            else:
-                continue    
-            # Process received line
-            print("Received:", data)
-            response = requests.post("http://127.0.0.1:8000/system/checktokenRaspi/")
-            if response.status_code == 200:
-                response_json = response.json()
-                # response_key = list(response_json.keys())[0]
-                # response_data = json.loads(response_key)
-                response_str = response_json[0]
-                response = json.loads(response_str)
-                print(response)
-                
-                if response['token_system'] == token: 
-                    if response['control_flag']:
-                        control_list = response['control_list']
-                        print(control_list)
-                    else:
-                        instantData = {
-                            'soil_moisture':soil_moisture,
-                            'temperature':temperature,
-                            'distance_water_level':distance_water_level,
-                        'token_system':token
-                }              
-                        requests.post("http://127.0.0.1:8000/system/sendData/",data=instantData)
-                else:
-                    print("No Flag")
-                time.sleep(2)
-            
-    except KeyboardInterrupt:
-        # Close serial port on KeyboardInterrupt
-        exit()
-        # ser.close()
+        # Test case 1: Request sensor data
+        sensor_data_request = json.dumps({
+            "data_flag": "true",
+            "control_flag": "false"
+        })
+        send_json_to_arduino(sensor_data_request)
+        print("Requesting sensor data...")
+        sensor_data = receive_from_arduino()
+        print("Received sensor data:", sensor_data)
 
-read_serial_data('COM5')
+        # Allow some time before the next command
+        time.sleep(2)
+
+        # Test case 2: Control the devices
+        control_command = json.dumps({
+            "data_flag": "false",
+            "control_flag": "true",
+            "water_pump": "true",
+            "water_plant": "false",
+            "uv": "true",
+            "ac": "false",
+            "heater": "true"
+        })
+        send_json_to_arduino(control_command)
+        print("Sent control command to Arduino.")
+
+        # Allow some time before the next command
+        time.sleep(2)
+
+        # Test case 3: Turn off all devices
+        control_command_off = json.dumps({
+            "data_flag": "false",
+            "control_flag": "true",
+            "water_pump": "false",
+            "water_plant": "false",
+            "uv": "false",
+            "ac": "false",
+            "heater": "false"
+        })
+        send_json_to_arduino(control_command_off)
+        print("Sent command to turn off all devices.")
+    except KeyboardInterrupt:
+        print("Program interrupted by the user.")
+    finally:
+        ser.close()
