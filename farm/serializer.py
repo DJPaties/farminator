@@ -59,12 +59,12 @@ class FarmSerializer(serializers.Serializer):
         farm.image = validated_data['image']
         farm.product_id = validated_data['product_id']
         if farm:
-            FarmConditions.objects.filter(farm_id_id=farm.id).delete()
+            FarmConditions.objects.filter(farm_id=farm.id).delete()
             for type in validated_data['conditions']:
                 if type in Condition_Type:
                     if validated_data['conditions'][type]['rule'] in Condition_Rule:
                         FarmConditions.objects.create(
-                            farm_id=farm, notify_at=validated_data['conditions'][type]['value'],
+                            farm_id=farm.id, notify_at=validated_data['conditions'][type]['value'],
                             condition_type=type, condition_rule=validated_data['conditions'][type]['rule'],)
                     else:
                         farm.delete()

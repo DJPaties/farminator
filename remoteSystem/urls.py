@@ -12,6 +12,9 @@ urlpatterns = [
     path("check_data/",views.CheckRemoteSystem.as_view(),name='checkflag'),
     path('sendData/',views.GetInstantDataSystem.as_view(),name='instantData'),
     path("checktokenRaspi/",views.CheckFlagSystem.as_view(),name="checkToken"),
-    path("setcontrols/",views.CheckControlSystem.as_view(),name="setcondition")
+    path("setcontrols/",views.CheckControlSystem.as_view(),name="setcondition"),
+    path('execDone/',views.ControlExecute.as_view(),name="execControl"),
+    path('setConditions/',views.CheckConditionSystem.as_view(),name="setConditions"),
+    path("saveConditions/",views.ConditionSet.as_view(),name="conditionSaved")
 
 ]

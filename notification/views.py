@@ -7,7 +7,9 @@ from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification as noti
 from rest_framework.permissions import IsAuthenticated
 from .models import Notification
-
+from remoteSystem.models import RemoteSystemRegister
+from farm.models import Farm
+import json
 # Create your views here.
 
 
@@ -57,3 +59,24 @@ class NotificationCreate(APIView):
                 'message': serializer.errors
             }
         return Response(data)
+    
+class CheckNotify(APIView):
+    def post(self, request):
+        remoteSystems = RemoteSystemRegister.objects.filter(custom_token=request.data['farm_token'])
+        farm = Farm.objects.filter(product_id=remoteSystems[0].id)
+        devices = FCMDevice.objects.filter(user_id=farm[0].user_id)
+        print(request.data )
+        message = json.loads(request.data['message'])
+        print(message)
+        for key in message:
+            print(key)
+            devices.send_message(
+                message=Message(
+                    notification=noti(
+                        title="Condition/s Breached!",
+                        body=message[key]
+                    ),
+                ),
+            )
+        #print(request.data['farm_token'])
+        return Response({request.data['message']})
