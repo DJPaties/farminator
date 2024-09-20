@@ -97,7 +97,7 @@ def read_serial_data(serial_port):
                         message['water_level'] = "The Water Level is Less Than " + conditions_loaded['water_level']['value']
                     if conditions_loaded['water_level']['rule'] == 'equal' and int(light_intensity) = int(conditions_loaded['water_level']['value']):
                         message['water_level'] = "The Water Level is Equal To " + conditions_loaded['water_level']['value']
-                 if conditions_loaded['soil_moisture'] != 'null':
+                if conditions_loaded['soil_moisture'] != 'null':
                     if conditions_loaded['soil_moisture']['rule'] == 'greater_than' and int(light_intensity) > int(conditions_loaded['soil_moisture']['value']): 
                         message['soil_moisture'] = "The Soil Moisture is Greater Than " + conditions_loaded['soil_moisture']['value']
                     if conditions_loaded['soil_moisture']['rule'] == 'less_than' and int(light_intensity) < int(conditions_loaded['soil_moisture']['value']): 
